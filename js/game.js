@@ -47,52 +47,18 @@ function main() {
 };
 
 // Game state
-var player = {
-    pos: [145, 430],
-    speed: 100,
-    boundary_x: [18, canvas.width - 42],
-    boundary_y: [100, canvas.height - 50],
-    sprite: new Sprite('images/game/characters.png', [121, 185], [27, 30], [0,1,2])
-};
+var player = new Player([145, 430]);
 
 var bullets = [];
 var bulletSpeed = 500;
 
 function update(delta) {
-    handleInput(delta);	
+    player.update(delta);
+    handleInput(delta);
 	updateEntities(delta);
 }
 
 function handleInput(delta) {
-	
-	if(input.isDown('DOWN') || input.isDown('s')) {
-		player.pos[1] += player.speed * delta;
-		if(player.pos[1] > player.boundary_y[1]) {
-			player.pos[1] = player.boundary_y[1];
-		}
-	}
-
-	if(input.isDown('UP') || input.isDown('w')) {
-		player.pos[1] -= player.speed * delta;
-		if(player.pos[1] < player.boundary_y[0]) {
-			player.pos[1] = player.boundary_y[0];
-		}		
-	}
-
-    if(input.isDown('LEFT') || input.isDown('a')) {
-        player.pos[0] -= player.speed * delta;
-		if(player.pos[0] < player.boundary_x[0]) {
-			player.pos[0] = player.boundary_x[0];
-		}	 
-    }
-
-    if(input.isDown('RIGHT') || input.isDown('d')) {
-        player.pos[0] += player.speed * delta;
-     	if(player.pos[0] > player.boundary_x[1]) {
-			player.pos[0] = player.boundary_x[1];
-		}	   
-    }
-
     if(input.isDown('SPACE')) {
     	var x = player.pos[0] + 7;
     	var y = player.pos[1] - 15;
@@ -129,7 +95,7 @@ function render() {
 		context.fillText(score, 155, 50);
 	}
 
-	renderEntity(player);
+	player.render(context);
 	renderEntities(bullets);
 }
 
