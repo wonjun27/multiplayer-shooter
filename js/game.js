@@ -7,18 +7,18 @@ var requestAnimFrame = (function() {
         || window.oRequestAnimationFrame      
         || window.msRequestAnimationFrame
         || function(callback) {
-            window.setTimeout(callback, 1000 / 60);
+            	window.setTimeout(callback, 1000 / 60);
         	};
 })();
 
 var time_game = 0;
 
 //Create a canvas
-var canvas = document.createElement("canvas");
-var context = canvas.getContext("2d");
-canvas.width = 320;
-canvas.height = 480;
-document.body.appendChild(canvas);
+var canvas, 
+	context,
+	localPlayer,
+	remotePlayers,
+	socket;
 
 // Background image
 var isBackgroundReady = false;
@@ -34,7 +34,6 @@ var score = 0;
 
 // Main Loop
 var time_last;	
-
 function main() {
     var now = Date.now();
     var delta = (now - time_last) / 1000.0;
@@ -47,21 +46,19 @@ function main() {
 };
 
 // Game state
-var player = new Player([145, 430]);
-
 var bullets = [];
 var bulletSpeed = 500;
 
 function update(delta) {
-    player.update(delta);
+    localPlayer.update(delta);
     handleInput(delta);
 	updateEntities(delta);
 }
 
 function handleInput(delta) {
     if(input.isDown('SPACE')) {
-    	var x = player.pos[0] + 7;
-    	var y = player.pos[1] - 15;
+    	var x = localPlayer.getX() + 7;
+    	var y = localPlayer.getY() - 15;
 
     	bullets.push({
     		pos: [x, y],
@@ -71,7 +68,7 @@ function handleInput(delta) {
 }
 
 function updateEntities(delta) {
-	player.sprite.update(delta);
+	localPlayer.sprite.update(delta);
 
 	for(var i = 0; i < bullets.length; i++) {
 		var bullet = bullets[i];
@@ -93,10 +90,10 @@ function render() {
 		context.textAlign = "left";
 		context.textBaseline = "top";
 		context.fillText(score, 155, 50);
-	}
 
-	player.render(context);
-	renderEntities(bullets);
+		localPlayer.render(context);
+		renderEntities(bullets);
+	}
 }
 
 function renderEntity(entity) {
@@ -113,11 +110,87 @@ function renderEntities(list) {
 }
 
 function init() {
+	canvas = document.createElement("canvas");
+	context = canvas.getContext("2d");
+	canvas.width = 320;
+	canvas.height = 480;
+	document.body.appendChild(canvas);
+
+	localPlayer = new Player(145, 430	);
+	remotePlayers = [];
+
+	if(typeof io !== 'undefined') {
+		socket = io.connect("http://localhost", {port: 8000, transports: ["websocket"]});
+		setEventHandlers();	
+	}
+	
+	
 	time_last = Date.now();
-	main();
+	main();	
 }
 
 resources.load([
     'images/game/characters.png'
 ]);
 resources.onReady(init);
+
+
+var setEventHandlers = function() {
+	socket.on("connect", onSocketConnected);
+	socket.on("disconnect", onSocketDisconnect);
+	socket.on("new player", onNewPlayer);
+	socket.on("move player", onMovePlayer);
+	socket.on("remove player", onRemovePlayer);
+};
+
+function onSocketConnected() {
+	console.log("Connected to socket server");
+	socket.emit("new player", {x: localPlayer.getX(), y: localPlayer.getY()});
+}
+
+function onSocketDisconnect() {
+	console.log("Disconntected from socket server");
+}
+
+function onNewPlayer(data) {
+	console.log("New Player connected: " + data.id);
+
+	var newPlayer = new Player(data.x, data.y);
+	newPlayer.id = data.id;
+
+	remotePlayers.push(newPlayer);	
+}
+
+function onMovePlayer(data) {
+	var playerToMove = getPlayer(data.id);
+
+	if(!playerToMove) {
+		console.log("Player not found: " + data.id);
+		return;
+	}
+
+	playerToMove.setX(data.x);
+	playerToMove.setY(data.y);
+}
+
+function onRemovePlayer(data) {
+	var playerToRemove = getPlayer(data.id);
+
+	if(!playerToRemove) {
+		console.log("Player not found: " + data.id);
+		return;
+	}
+
+	remotePlayers.splice(remotePlayers.indexOf(playerToRemove), 1);
+}
+
+function getPlayer(id) {
+	for(var int = 0; i < remotePlayers.length; i++) {
+		if(remotePlayers[i].id == id) {
+			return remotePlayers[i];
+		}
+	}
+
+	return false;
+}
+
