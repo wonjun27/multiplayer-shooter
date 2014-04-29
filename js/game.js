@@ -50,7 +50,6 @@ var bullets = [];
 var bulletSpeed = 500;
 
 function update(delta) {
-    localPlayer.update(delta);
     handleInput(delta);
 	updateEntities(delta);
 }
@@ -68,7 +67,15 @@ function handleInput(delta) {
 }
 
 function updateEntities(delta) {
-	localPlayer.sprite.update(delta);
+    if(localPlayer.update(delta)) {
+    	if(socket) {
+			socket.emit("move player", {x: localPlayer.getX(), y: localPlayer.getY()});
+    	}
+    }
+    
+	for(var i = 0; i < remotePlayers.length; i++) {
+    	remotePlayers[i].update(delta);
+    }
 
 	for(var i = 0; i < bullets.length; i++) {
 		var bullet = bullets[i];
@@ -92,6 +99,11 @@ function render() {
 		context.fillText(score, 155, 50);
 
 		localPlayer.render(context);
+
+		for(var i = 0; i < remotePlayers.length; i++) {
+    		remotePlayers[i].render(context);
+    	}
+
 		renderEntities(bullets);
 	}
 }
@@ -116,14 +128,13 @@ function init() {
 	canvas.height = 480;
 	document.body.appendChild(canvas);
 
-	localPlayer = new Player(145, 430	);
+	localPlayer = new Player(145, 430, true);
 	remotePlayers = [];
 
 	if(typeof io !== 'undefined') {
 		socket = io.connect("http://localhost", {port: 8000, transports: ["websocket"]});
 		setEventHandlers();	
 	}
-	
 	
 	time_last = Date.now();
 	main();	
@@ -155,13 +166,14 @@ function onSocketDisconnect() {
 function onNewPlayer(data) {
 	console.log("New Player connected: " + data.id);
 
-	var newPlayer = new Player(data.x, data.y);
-	newPlayer.id = data.id;
+	var newPlayer = new Player(data.x, data.y, false);
+	newPlayer.setID(data.id);
 
 	remotePlayers.push(newPlayer);	
 }
 
 function onMovePlayer(data) {
+	console.log("other player moved" + " " + data.x + " " +data.y);
 	var playerToMove = getPlayer(data.id);
 
 	if(!playerToMove) {
@@ -185,8 +197,8 @@ function onRemovePlayer(data) {
 }
 
 function getPlayer(id) {
-	for(var int = 0; i < remotePlayers.length; i++) {
-		if(remotePlayers[i].id == id) {
+	for(var i = 0; i < remotePlayers.length; i++) {
+		if(remotePlayers[i].getID() == id) {
 			return remotePlayers[i];
 		}
 	}

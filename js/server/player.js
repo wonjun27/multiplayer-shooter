@@ -3,6 +3,10 @@ var Player = function(posX, posY) {
 		y = posY,
 		id;
 
+	var setID = function(value) {
+		id = value;
+	}
+
 	var getID = function() {
 		return id;
 	}
@@ -22,13 +26,14 @@ var Player = function(posX, posY) {
 	var setY = function(posY) {
 		y = posY;
 	}	
-
+	
 	return {
 		getX: getX,
 		getY: getY,
 		setX: setX,
 		setY: setY,
-		getID: getID
+		getID: getID,
+		setID: setID
 	}
 };
 
