@@ -6,7 +6,7 @@
 
 	EnemyManager.prototype = {
 		update: function(delta) {
-		    if(Date.now() - this.timeLastSpawned > 5000 && this.enemies.length < 1) {
+		    if(Date.now() - this.timeLastSpawned > 2000) {
 		    	var enemy = new Enemy(145, 20);
 		        this.enemies.push(enemy);
 		        this.timeLastSpawned = Date.now();
@@ -36,6 +36,23 @@
 
     			if(boxCollides([x,y], enemy_size, pos, size))
     			{
+    				return true;
+    			}
+    		}		
+		},
+		checkBulletHits: function(pos, size) {
+			for(var i = 0; i < this.enemies.length; i++) {
+    			var x = this.enemies[i].getX();
+    	    	var y = this.enemies[i].getY();		
+    			var enemy_size = this.enemies[i].getSize();
+
+    			if(boxCollides([x,y], enemy_size, pos, size))
+    			{
+    				if(this.enemies[i].takeHit(1) <= 0) {
+    					this.enemies.splice(i, 1);	
+    					return true;
+    				}
+
     				return true;
     			}
     		}		

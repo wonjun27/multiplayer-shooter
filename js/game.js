@@ -128,8 +128,16 @@ function renderEntities(list) {
 }
 
 function checkCollisions() {
+	//check collision with the local player
 	if(enemyManager.checkCollisions([localPlayer.getX(),localPlayer.getY()], localPlayer.getSize())) {
 		gameOver();
+	}
+
+	for(var i = 0; i < bullets.length; i++) {
+		var bullet = bullets[i];
+		if(enemyManager.checkBulletHits([bullet.pos[0],bullet.pos[1]], [7,25])) {
+			bullets.splice(i, 1);
+		}
 	}
 }
 
