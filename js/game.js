@@ -68,11 +68,13 @@ function handleInput(delta) {
 }
 
 function updateEntities(delta) {
-    if(localPlayer.update(delta)) {
-    	if(socket) {
-			socket.emit("move player", {x: localPlayer.getX(), y: localPlayer.getY()});
-    	}
-    }
+	if(!isGameOver) {
+	    if(localPlayer.update(delta)) {
+	    	if(socket) {
+				socket.emit("move player", {x: localPlayer.getX(), y: localPlayer.getY()});
+	    	}
+	    }
+	}
     
 	for(var i = 0; i < remotePlayers.length; i++) {
     	remotePlayers[i].update(delta);
@@ -154,6 +156,10 @@ function init() {
 	canvas.height = 480;
 	document.body.appendChild(canvas);
 
+	document.getElementById('play-again').addEventListener('click', function() {
+        reset();
+    });
+
 	localPlayer = new Player(145, 430, true);
 	remotePlayers = [];
 	enemyManager = new EnemyManager();
@@ -163,8 +169,18 @@ function init() {
 		setEventHandlers();	
 	}
 	
+	reset();
 	time_last = Date.now();
 	main();	
+}
+
+
+function reset() {
+	document.getElementById('game-over').style.display = 'none';
+    document.getElementById('game-over-overlay').style.display = 'none';
+    isGameOver = false;
+
+    localPlayer = new Player(145, 430, true); 
 }
 
 resources.load([

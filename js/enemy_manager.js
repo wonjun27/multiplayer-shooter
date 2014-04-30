@@ -25,6 +25,9 @@
     			this.enemies[i].render(context);
     		}
 		},
+		reset: function() {
+			this.enemies = [];
+		},
 		checkCollisions: function(pos, size) {
 			for(var i = 0; i < this.enemies.length; i++) {
     			var x = this.enemies[i].getX();
