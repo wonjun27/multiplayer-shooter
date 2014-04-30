@@ -11,15 +11,14 @@ var requestAnimFrame = (function() {
         	};
 })();
 
-var time_game = 0;
-
 //Create a canvas
 var canvas, 
 	context,
 	localPlayer,
 	remotePlayers,
-	enemyManager,
 	socket,
+	enemyManager,
+	score,
 	isGameOver;
 
 // Background image
@@ -31,10 +30,10 @@ imageBackground.onload = function () {
 imageBackground.src = "images/interface/background.jpg";
 
 // Game state
+var time_game = 0;
 var bullets = [];
 var explosions = [];
 var bulletSpeed = 500;
-var score = 0;
 
 // Main Loop
 var time_last;	
@@ -48,7 +47,6 @@ function main() {
     time_last = now;
     requestAnimFrame(main);
 };
-
 
 
 function update(delta) {
@@ -94,6 +92,16 @@ function updateEntities(delta) {
 			bullets.splice(i, 1);
 		}
 	}
+
+    for(var i = 0; i < explosions.length; i++) {
+        explosions[i].sprite.update(delta);
+
+        // Remove if animation is done
+        if(explosions[i].sprite.done) {
+            explosions.splice(i, 1);
+            i--;
+        }
+    }
 }
 
 function render() {
@@ -107,7 +115,9 @@ function render() {
     	}
 
 		enemyManager.render(context);
+
 		renderEntities(bullets);
+		renderEntities(explosions);
 
 		// Score
 		context.fillStyle = "rgb(250, 250, 250)";
@@ -160,7 +170,6 @@ function boxCollides(pos, size, pos2, size2) {
                     pos2[0] + size2[0], pos2[1] + size2[1]);
 }
 
-
 function init() {
 	canvas = document.createElement("canvas");
 	context = canvas.getContext("2d");
@@ -192,7 +201,7 @@ function reset() {
     document.getElementById('game-over-overlay').style.display = 'none';
     
     isGameOver = false;
-    score = 0;
+    enemyManager.resetKills();
 
     localPlayer = new Player(145, 430, true); 
 }

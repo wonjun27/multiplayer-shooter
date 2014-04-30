@@ -31,6 +31,9 @@
 		reset: function() {
 			this.enemies = [];
 		},
+		resetKills: function() {
+			this.kills = 0;
+		},
 		checkCollisions: function(pos, size) {
 			for(var i = 0; i < this.enemies.length; i++) {
     			var x = this.enemies[i].getX();
@@ -54,6 +57,17 @@
     				if(this.enemies[i].takeHit(1) <= 0) {
     					this.kills++;
     					this.enemies.splice(i, 1);	
+
+		                // Add an explosion
+		                explosions.push({
+		                    pos: [x,y],
+		                    sprite: new Sprite('images/game/characters.png',
+		                                       [20, 344],
+		                                       [43, 42],
+		                                       [0, 1, 2, 3, 4, 5, 6, 7, 8],
+		                                       true)
+		                });
+
     					return true;
     				}
 
