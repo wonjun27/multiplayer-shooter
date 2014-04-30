@@ -32,6 +32,7 @@ imageBackground.src = "images/interface/background.jpg";
 
 // Game state
 var bullets = [];
+var explosions = [];
 var bulletSpeed = 500;
 var score = 0;
 
@@ -189,7 +190,9 @@ function init() {
 function reset() {
 	document.getElementById('game-over').style.display = 'none';
     document.getElementById('game-over-overlay').style.display = 'none';
+    
     isGameOver = false;
+    score = 0;
 
     localPlayer = new Player(145, 430, true); 
 }

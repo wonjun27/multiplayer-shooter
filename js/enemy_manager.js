@@ -1,16 +1,16 @@
 (function() {
 	function EnemyManager() {
 		this.enemies = [];
-		this.timeLastSpawned = 0;
+		this.totalDeltas = 0;
 		this.kills = 0;
 	};
 
 	EnemyManager.prototype = {
 		update: function(delta) {
-		    if(Date.now() - this.timeLastSpawned > 2000) {
+		    if(this.totalDeltas > 2) {
 		    	var enemy = new Enemy(145, 20);
 		        this.enemies.push(enemy);
-		        this.timeLastSpawned = Date.now();
+		        this.totalDeltas = 0;
 		    }
 
 			for(var i = 0; i < this.enemies.length; i++) {
@@ -20,6 +20,8 @@
 		    		this.enemies.splice(this.enemies[i], 1);
 		    	}
 		    }
+
+		    this.totalDeltas += delta;
 		},
 		render: function(context) {
 			for(var i = 0; i < this.enemies.length; i++) {
