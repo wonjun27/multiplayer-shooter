@@ -28,10 +28,13 @@ var imageBackground = new Image();
 imageBackground.onload = function () {
 	isBackgroundReady = true;
 };
-
 imageBackground.src = "images/interface/background.jpg";
 
+// Game state
+var bullets = [];
+var bulletSpeed = 500;
 var score = 0;
+
 // Main Loop
 var time_last;	
 function main() {
@@ -45,14 +48,14 @@ function main() {
     requestAnimFrame(main);
 };
 
-// Game state
-var bullets = [];
-var bulletSpeed = 500;
+
 
 function update(delta) {
     handleInput(delta);
 	updateEntities(delta);
 	checkCollisions();
+	
+	score = enemyManager.getKills();
 }
 
 function handleInput(delta) {

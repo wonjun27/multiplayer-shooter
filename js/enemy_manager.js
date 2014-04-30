@@ -2,6 +2,7 @@
 	function EnemyManager() {
 		this.enemies = [];
 		this.timeLastSpawned = 0;
+		this.kills = 0;
 	};
 
 	EnemyManager.prototype = {
@@ -49,6 +50,7 @@
     			if(boxCollides([x,y], enemy_size, pos, size))
     			{
     				if(this.enemies[i].takeHit(1) <= 0) {
+    					this.kills++;
     					this.enemies.splice(i, 1);	
     					return true;
     				}
@@ -56,7 +58,10 @@
     				return true;
     			}
     		}		
-		}
+		},
+		getKills: function() {
+			return this.kills;
+		},
 	};
 
    window.EnemyManager = EnemyManager; 

@@ -4,7 +4,7 @@
 		this.x = x;
 		this.y = y;
 		this.speed = 30;
-		this.hits = 150;
+		this.hits = 50;
 		this.boundary_x = [18, canvas.width - 42];
 		this.boundary_y = [100, canvas.height - 50];
 		this.sprite = new Sprite('images/game/characters.png', [360, 290], [40, 35], [0,1,0,1,2]);
