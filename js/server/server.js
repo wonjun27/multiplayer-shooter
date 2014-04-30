@@ -75,8 +75,6 @@ function onMovePlayer(data) {
 }
 
 function getPlayer(id) {
-
-
 	for(var i = 0; i < players.length; i++) {
 		if(players[i].getID() == id) {
 			return players[i];

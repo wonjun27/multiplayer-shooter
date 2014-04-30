@@ -75,6 +75,9 @@
 		},
 		setY: function(posY) {
 			this.y = posY;
+		},
+		getSize: function() {
+			return this.sprite.size;
 		}
 	};
 

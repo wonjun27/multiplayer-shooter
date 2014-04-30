@@ -18,7 +18,9 @@ var canvas,
 	context,
 	localPlayer,
 	remotePlayers,
-	socket;
+	enemyManager,
+	socket,
+	isGameOver;
 
 // Background image
 var isBackgroundReady = false;
@@ -29,9 +31,7 @@ imageBackground.onload = function () {
 
 imageBackground.src = "images/interface/background.jpg";
 
-
 var score = 0;
-
 // Main Loop
 var time_last;	
 function main() {
@@ -52,6 +52,7 @@ var bulletSpeed = 500;
 function update(delta) {
     handleInput(delta);
 	updateEntities(delta);
+	checkCollisions();
 }
 
 function handleInput(delta) {
@@ -63,7 +64,7 @@ function handleInput(delta) {
     		pos: [x, y],
     		sprite: new Sprite('images/game/characters.png', [107,145], [7, 25], [0])
     	});
-    }
+    }	
 }
 
 function updateEntities(delta) {
@@ -76,6 +77,8 @@ function updateEntities(delta) {
 	for(var i = 0; i < remotePlayers.length; i++) {
     	remotePlayers[i].update(delta);
     }
+
+	enemyManager.update(delta);
 
 	for(var i = 0; i < bullets.length; i++) {
 		var bullet = bullets[i];
@@ -91,20 +94,21 @@ function render() {
 	if (isBackgroundReady) {
 		context.drawImage(imageBackground, 0, 0, canvas.width, canvas.height);
 
-		// Score
-		context.fillStyle = "rgb(250, 250, 250)";
-		context.font = "32px unicorn bold";
-		context.textAlign = "left";
-		context.textBaseline = "top";
-		context.fillText(score, 155, 50);
-
 		localPlayer.render(context);
 
 		for(var i = 0; i < remotePlayers.length; i++) {
     		remotePlayers[i].render(context);
     	}
 
+		enemyManager.render(context);
 		renderEntities(bullets);
+
+		// Score
+		context.fillStyle = "rgb(250, 250, 250)";
+		context.font = "32px unicorn bold";
+		context.textAlign = "left";
+		context.textBaseline = "top";
+		context.fillText(score, 155, 50);
 	}
 }
 
@@ -121,6 +125,28 @@ function renderEntities(list) {
 	}
 }
 
+function checkCollisions() {
+	if(enemyManager.checkCollisions([localPlayer.getX(),localPlayer.getY()], localPlayer.getSize())) {
+		gameOver();
+	}
+}
+
+function collides(x, y, r, b, x2, y2, r2, b2) {
+    return !( r <= x2 
+    	   	|| x > r2
+    	   	|| b <= y2 
+    	   	|| y > b2);
+}
+
+function boxCollides(pos, size, pos2, size2) {
+	//console.log(pos[0] + " " + pos[1] + " " + size + " " +pos2[0] + " " +pos2[1] + " "+ size2)
+    return collides(pos[0], pos[1],
+                    pos[0] + size[0], pos[1] + size[1],
+                    pos2[0], pos2[1],
+                    pos2[0] + size2[0], pos2[1] + size2[1]);
+}
+
+
 function init() {
 	canvas = document.createElement("canvas");
 	context = canvas.getContext("2d");
@@ -130,6 +156,7 @@ function init() {
 
 	localPlayer = new Player(145, 430, true);
 	remotePlayers = [];
+	enemyManager = new EnemyManager();
 
 	if(typeof io !== 'undefined') {
 		socket = io.connect("http://localhost", {port: 8000, transports: ["websocket"]});
@@ -145,6 +172,12 @@ resources.load([
 ]);
 resources.onReady(init);
 
+
+function gameOver() {
+    document.getElementById('game-over').style.display = 'block';
+    document.getElementById('game-over-overlay').style.display = 'block';
+    isGameOver = true;
+}
 
 var setEventHandlers = function() {
 	socket.on("connect", onSocketConnected);
@@ -205,4 +238,3 @@ function getPlayer(id) {
 
 	return false;
 }
-
