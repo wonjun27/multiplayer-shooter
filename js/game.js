@@ -125,6 +125,12 @@ function render() {
 		context.textAlign = "left";
 		context.textBaseline = "top";
 		context.fillText(score, 155, 50);
+		
+		if(remotePlayers.length == 0) {
+			context.fillStyle = "rgb(0, 250, 0)";
+			context.font = "18px unicorn bold";
+			context.fillText("Single Player Mode: Try Multiplayer!", 25, 10);
+		}
 	}
 }
 
