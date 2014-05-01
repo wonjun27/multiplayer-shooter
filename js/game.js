@@ -58,11 +58,7 @@ function update(delta) {
 
 function updateEntities(delta) {
 	if(!isGameOver) {
-	    if(localPlayer.update(delta)) {
-	    	if(socket) {
-				socket.emit("move player", {x: localPlayer.getX(), y: localPlayer.getY()});
-	    	}
-	    }
+	    localPlayer.update(delta);
 	}
     
 	for(var i = 0; i < remotePlayers.length; i++) {
@@ -140,7 +136,7 @@ function checkCollisions() {
 	var bullets = bulletManager.getBullets();
 	for(var i = 0; i < bullets.length; i++) {
 		var bullet = bullets[i];
-		if(enemyManager.checkBulletHits([bullet.x,bullet.y], [7,25])) {
+		if(enemyManager.checkBulletHits([bullet.x,bullet.y], [7,25], bullet.isLocal)) {
 			bulletManager.removeBullet(i); 
 		}
 	}
@@ -215,6 +211,7 @@ var setEventHandlers = function() {
 	socket.on("new player", onNewPlayer);
 	socket.on("move player", onMovePlayer);
 	socket.on("remove player", onRemovePlayer);
+	socket.on("new bullet", onNewBullet);
 };
 
 function onSocketConnected() {
@@ -257,6 +254,10 @@ function onRemovePlayer(data) {
 	}
 
 	remotePlayers.splice(remotePlayers.indexOf(playerToRemove), 1);
+}
+
+function onNewBullet(data) {
+	bulletManager.addBullet(data.x, data.y, false);
 }
 
 function getPlayer(id) {

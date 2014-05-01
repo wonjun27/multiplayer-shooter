@@ -85,14 +85,22 @@
 				}	   
 		    }
 
-		    if(input.isDown('SPACE') || touchCharacter) {
+		   	if(socket) {
+		   		if(prevX != this.x || prevY != this.y) {
+					socket.emit("move player", {x: localPlayer.getX(), y: localPlayer.getY()});
+		   		}
+	    	}
+
+	    	if(input.isDown('SPACE') || touchCharacter) {
 		    	var x = this.x + 7;
 		    	var y = this.y - 15;
 
-		    	bulletManager.addBullet(x, y);
-		    }	
+		    	bulletManager.addBullet(x, y, true);
 
-		    return (prevX != this.x || prevY != this.y) ? true : false;	
+		    	if(socket) {
+		    		socket.emit("new bullet", {x: x, y: y});
+		    	}
+		    }
 		},
 		render: function(context) {
 			context.save();

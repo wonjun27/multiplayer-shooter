@@ -23,10 +23,11 @@
 				context.restore();
 			}	
 		},
-		addBullet: function(posX, posY) {
+		addBullet: function(posX, posY, isLocal) {
 		    this.bullets.push({
 		    	x: posX,
 		    	y: posY,
+		    	isLocal: isLocal,
 		    	sprite: new Sprite('images/game/characters.png', [107,145], [7, 25], [0])
 		    });
 		},

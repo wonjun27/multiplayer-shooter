@@ -46,7 +46,7 @@
     			}
     		}		
 		},
-		checkBulletHits: function(pos, size) {
+		checkBulletHits: function(pos, size, isLocal) {
 			for(var i = 0; i < this.enemies.length; i++) {
     			var x = this.enemies[i].getX();
     	    	var y = this.enemies[i].getY();		
@@ -55,7 +55,10 @@
     			if(boxCollides([x,y], enemy_size, pos, size))
     			{
     				if(this.enemies[i].takeHit(1) <= 0) {
-    					this.kills++;
+    					if(isLocal) {
+	    					this.kills++;    						
+    					}
+
     					this.enemies.splice(i, 1);	
 
 		                // Add an explosion

@@ -26,6 +26,7 @@ function onSocketConnection(client) {
 	client.on("disconnect", onClientDisconnect);
 	client.on("new player", onNewPlayer);
 	client.on("move player", onMovePlayer);
+	client.on("new bullet", onNewBullet);
 }
 
 function onClientDisconnect() {
@@ -72,6 +73,10 @@ function onMovePlayer(data) {
 	playerToMove.setY(data.y);
 
 	this.broadcast.emit("move player", {id: playerToMove.getID(), x: playerToMove.getX(), y: playerToMove.getY()});	
+}
+
+function onNewBullet(data) {
+	this.broadcast.emit("new bullet", {x: data.x, y: data.y});
 }
 
 function getPlayer(id) {
