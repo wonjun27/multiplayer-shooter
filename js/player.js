@@ -89,10 +89,7 @@
 		    	var x = this.x + 7;
 		    	var y = this.y - 15;
 
-		    	bullets.push({
-		    		pos: [x, y],
-		    		sprite: new Sprite('images/game/characters.png', [107,145], [7, 25], [0])
-		    	});
+		    	bulletManager.addBullet(x, y);
 		    }	
 
 		    return (prevX != this.x || prevY != this.y) ? true : false;	

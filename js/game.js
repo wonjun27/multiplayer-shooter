@@ -18,6 +18,7 @@ var canvas,
 	remotePlayers,
 	socket,
 	enemyManager,
+	bulletManager,
 	score,
 	isGameOver;
 
@@ -31,9 +32,7 @@ imageBackground.src = "images/interface/background.jpg";
 
 // Game state
 var time_game = 0;
-var bullets = [];
 var explosions = [];
-var bulletSpeed = 500;
 
 // Main Loop
 var time_last;	
@@ -50,6 +49,7 @@ function main() {
 
 
 function update(delta) {
+
 	updateEntities(delta);
 	checkCollisions();
 	
@@ -70,15 +70,7 @@ function updateEntities(delta) {
     }
 
 	enemyManager.update(delta);
-
-	for(var i = 0; i < bullets.length; i++) {
-		var bullet = bullets[i];
-		bullet.pos[1] -= bulletSpeed * delta;
-
-		if(bullet.pos[1] < -bullet.sprite.size[1]) {
-			bullets.splice(i, 1);
-		}
-	}
+	bulletManager.update(delta);
 
     for(var i = 0; i < explosions.length; i++) {
         explosions[i].sprite.update(delta);
@@ -102,8 +94,8 @@ function render() {
     	}
 
 		enemyManager.render(context);
+		bulletManager.render(context);
 
-		renderEntities(bullets);
 		renderEntities(explosions);
 
 		// Score
@@ -117,6 +109,11 @@ function render() {
 			context.fillStyle = "rgb(0, 250, 0)";
 			context.font = "18px unicorn bold";
 			context.fillText("Single Player Mode: Try Multiplayer!", 25, 10);
+		}
+		else {
+			context.fillStyle = "rgb(0, 250, 0)";
+			context.font = "18px unicorn bold";
+			context.fillText("Multiplayer Mode!", 25, 10);
 		}
 	}
 }
@@ -140,10 +137,11 @@ function checkCollisions() {
 		gameOver();
 	}
 
+	var bullets = bulletManager.getBullets();
 	for(var i = 0; i < bullets.length; i++) {
 		var bullet = bullets[i];
-		if(enemyManager.checkBulletHits([bullet.pos[0],bullet.pos[1]], [7,25])) {
-			bullets.splice(i, 1);
+		if(enemyManager.checkBulletHits([bullet.x,bullet.y], [7,25])) {
+			bulletManager.removeBullet(i); 
 		}
 	}
 }
@@ -164,7 +162,7 @@ function boxCollides(pos, size, pos2, size2) {
 }
 
 function init() {
-	canvas = document.createElement("canvas");
+    canvas = document.createElement("canvas");
 	context = canvas.getContext("2d");
 	canvas.width = 320;
 	canvas.height = 480;
@@ -174,24 +172,20 @@ function init() {
         reset();
     });
 
-    document.getElementById('play-again').addEventListener('touchstart', function() {
-        reset();
-    });
-
 	localPlayer = new Player(145, 430, true);
 	remotePlayers = [];
 	enemyManager = new EnemyManager();
+	bulletManager = new BulletManager();
 
 	if(typeof io !== 'undefined') {
 		socket = io.connect("http://localhost", {port: 8000, transports: ["websocket"]});
 		setEventHandlers();	
 	}
-
+	
 	reset();
 	time_last = Date.now();
 	main();	
 }
-
 
 function reset() {
 	document.getElementById('game-over').style.display = 'none';
