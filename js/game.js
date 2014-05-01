@@ -50,23 +50,10 @@ function main() {
 
 
 function update(delta) {
-    handleInput(delta);
 	updateEntities(delta);
 	checkCollisions();
 	
 	score = enemyManager.getKills();
-}
-
-function handleInput(delta) {
-    if(input.isDown('SPACE')) {
-    	var x = localPlayer.getX() + 7;
-    	var y = localPlayer.getY() - 15;
-
-    	bullets.push({
-    		pos: [x, y],
-    		sprite: new Sprite('images/game/characters.png', [107,145], [7, 25], [0])
-    	});
-    }	
 }
 
 function updateEntities(delta) {
@@ -187,6 +174,10 @@ function init() {
         reset();
     });
 
+    document.getElementById('play-again').addEventListener('touchstart', function() {
+        reset();
+    });
+
 	localPlayer = new Player(145, 430, true);
 	remotePlayers = [];
 	enemyManager = new EnemyManager();
@@ -195,7 +186,7 @@ function init() {
 		socket = io.connect("http://localhost", {port: 8000, transports: ["websocket"]});
 		setEventHandlers();	
 	}
-	
+
 	reset();
 	time_last = Date.now();
 	main();	

@@ -22,33 +22,78 @@
 			var prevX = this.x,
 			 	prevY = this.y;
 
-			if(input.isDown('DOWN') || input.isDown('s')) {
+			var touchDown = false,
+				touchUp = false,
+				touchLeft = false,
+				touchRight = false,
+				touchCharacter = false,
+				TOUCH_MARGIN = 10;
+
+			if(input.isTouch()) {
+		    	var touchX = input.getTouchPosX();
+		    	var touchY = input.getTouchPosY();
+
+		    	if(touchX > this.x - TOUCH_MARGIN && touchX < this.x + this.sprite.getSizeX() + TOUCH_MARGIN
+		    	&& touchY > this.y - TOUCH_MARGIN && touchY < this.y + this.sprite.getSizeY() + TOUCH_MARGIN) {
+		    		touchCharacter = true
+		    	}
+		    	else {
+		    		
+		    		if(touchX < this.x - TOUCH_MARGIN) {
+		    			touchLeft = true;
+		    		}
+
+		    		if(touchX > this.x + this.sprite.getSizeX() + TOUCH_MARGIN) {
+		    			touchRight = true;
+		    		}
+
+					if(touchY < this.y - TOUCH_MARGIN) {
+		    			touchUp = true;
+		    		}
+
+					if(touchY > this.y + this.sprite.getSizeY() + TOUCH_MARGIN) {
+		    			touchDown = true;
+		    		}	    				    		
+		    	}
+		    }
+
+			if(input.isDown('DOWN') || input.isDown('s') || touchDown) {
 				this.y += this.speed * delta;
 				if(this.y > this.boundary_y[1]) {
 					this.y = this.boundary_y[1];
 				}
 			}
 
-			if(input.isDown('UP') || input.isDown('w')) {
+			if(input.isDown('UP') || input.isDown('w') || touchUp) {
 				this.y -= this.speed * delta;
 				if(this.y < this.boundary_y[0]) {
 					this.y = this.boundary_y[0];
 				}		
 			}
 
-		    if(input.isDown('LEFT') || input.isDown('a')) {
+		    if(input.isDown('LEFT') || input.isDown('a') || touchLeft) {
 		        this.x -= this.speed * delta;
 				if(this.x < this.boundary_x[0]) {
 					this.x = this.boundary_x[0];
 				}	 
 		    }
 
-		    if(input.isDown('RIGHT') || input.isDown('d')) {
+		    if(input.isDown('RIGHT') || input.isDown('d') || touchRight) {
 		        this.x += this.speed * delta;
 		     	if(this.x > this.boundary_x[1]) {	
 					this.x = this.boundary_x[1];
 				}	   
 		    }
+
+		    if(input.isDown('SPACE') || touchCharacter) {
+		    	var x = this.x + 7;
+		    	var y = this.y - 15;
+
+		    	bullets.push({
+		    		pos: [x, y],
+		    		sprite: new Sprite('images/game/characters.png', [107,145], [7, 25], [0])
+		    	});
+		    }	
 
 		    return (prevX != this.x || prevY != this.y) ? true : false;	
 		},

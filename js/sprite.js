@@ -35,6 +35,12 @@
 		},
 		isDone: function() {
 			return this.done;
+		},
+		getSizeX: function() {
+			return this.size[0];
+		},
+		getSizeY: function() {
+			return this.size[1];
 		}
 	};
 
