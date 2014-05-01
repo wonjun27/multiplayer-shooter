@@ -1,11 +1,12 @@
-To start a multiplayer game server, please run
+- To start a multiplayer game server, please run
 
+cd server
 node server.js 
 
-(found in the folder, "server")
+- You can run multiple index.html to open multiple clients.
 
-you can run multiple index.html to run multiple clients.
 
+- Touch Mobile is tested on Android S2
 
 ==============================
 Future To-Dos
@@ -16,3 +17,4 @@ Future To-Dos
 - More Enemies
 - Collectibles
 - Power Boosts
+- Networking driven by the server

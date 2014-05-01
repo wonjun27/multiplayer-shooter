@@ -111,6 +111,12 @@ function render() {
 			context.font = "18px unicorn bold";
 			context.fillText("Multiplayer Mode!", 25, 10);
 		}
+
+		context.fillStyle = "rgb(0, 250, 0)";
+		context.font = "15px unicorn bold";
+		context.fillText("To Move:  WASD/Arrow Keys  or Touch", 25, 440);
+		context.fillText("To Shoot: Spacebar         or Touch Hero", 25, 460);
+
 	}
 }
 
@@ -168,7 +174,11 @@ function init() {
         reset();
     });
 
-	localPlayer = new Player(145, 430, true);
+	document.getElementById('play-again').addEventListener('touchstart', function() {
+        reset();
+    });
+
+	localPlayer = new Player(145, 410, true);
 	remotePlayers = [];
 	enemyManager = new EnemyManager();
 	bulletManager = new BulletManager();
@@ -190,7 +200,7 @@ function reset() {
     isGameOver = false;
     enemyManager.resetKills();
 
-    localPlayer = new Player(145, 430, true); 
+    localPlayer = new Player(145, 410, true); 
 }
 
 resources.load([
