@@ -3,14 +3,19 @@
 		this.enemies = [];
 		this.totalDeltas = 0;
 		this.kills = 0;
+		this.isSpawningLocally = true;
 	};
 
 	EnemyManager.prototype = {
 		update: function(delta) {
-		    if(this.totalDeltas > 2) {
+		    if(this.isSpawningLocally && this.totalDeltas > 2) {
 		    	var enemy = new Enemy(145, 20);
 		        this.enemies.push(enemy);
 		        this.totalDeltas = 0;
+		        
+		        if(socket) {
+			    	socket.emit("create enemy", {x: enemy.getX(), y: enemy.getY()});
+		    	}
 		    }
 
 			for(var i = 0; i < this.enemies.length; i++) {
@@ -30,6 +35,7 @@
 		},
 		reset: function() {
 			this.enemies = [];
+			this.totalDeltas = 0;
 		},
 		resetKills: function() {
 			this.kills = 0;
@@ -80,6 +86,13 @@
 		},
 		getKills: function() {
 			return this.kills;
+		},
+		setSpawningLocally: function(value) {
+			this.isSpawningLocally = value;
+		},
+		spawnEnemy: function() {
+			var enemy = new Enemy(145, 20);
+		    this.enemies.push(enemy);
 		},
 	};
 

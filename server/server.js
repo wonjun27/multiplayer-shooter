@@ -7,12 +7,15 @@ var socket,
 
 function init() {
 	players = [];
+	enemies = [];
 	socket = io.listen(8000);
 
 	socket.configure(function(){
 		socket.set("transports", ["websocket"]);
 		socket.set("log level", 2);
 	});
+
+
 
 	setEventHandlers();
 }
@@ -26,7 +29,11 @@ function onSocketConnection(client) {
 	client.on("disconnect", onClientDisconnect);
 	client.on("new player", onNewPlayer);
 	client.on("move player", onMovePlayer);
+	client.on("create enemy", onCreateEnemy);	
 	client.on("new bullet", onNewBullet);
+
+
+
 }
 
 function onClientDisconnect() {
@@ -56,6 +63,23 @@ function onNewPlayer(data) {
 		this.emit("new player", {id: existingPlayer.getID(), x: existingPlayer.getX(), y: existingPlayer.getY()});
 	}
 
+	var doesSpawnerExist = false;
+
+	for(var i = 0; i < players.length; i++) {
+		if(players[i].isSpawningEnemies()) {
+			doesSpawnerExist = true;
+			break;
+		}
+	}
+
+	if(doesSpawnerExist) {
+		newPlayer.setSpawningEnemies(false);	
+		this.emit("nospawn");
+	} else {
+		newPlayer.setSpawningEnemies(true);
+		this.emit("spawn");
+	}
+
 	players.push(newPlayer);
 };
 
@@ -73,6 +97,10 @@ function onMovePlayer(data) {
 	playerToMove.setY(data.y);
 
 	this.broadcast.emit("move player", {id: playerToMove.getID(), x: playerToMove.getX(), y: playerToMove.getY()});	
+}
+
+function onCreateEnemy(data) {
+	this.broadcast.emit("create enemy", {x: data.x, y: data.y})
 }
 
 function onNewBullet(data) {

@@ -212,6 +212,10 @@ var setEventHandlers = function() {
 	socket.on("move player", onMovePlayer);
 	socket.on("remove player", onRemovePlayer);
 	socket.on("new bullet", onNewBullet);
+	socket.on("create enemy", onCreateEnemy);				
+	socket.on("spawn", onSpawn);	
+	socket.on("nospawn", onNoSpawn);	
+	socket.on("test test", onTest);	
 };
 
 function onSocketConnected() {
@@ -221,6 +225,7 @@ function onSocketConnected() {
 
 function onSocketDisconnect() {
 	console.log("Disconntected from socket server");
+	enemyManager.setSpawningLocally(true);
 }
 
 function onNewPlayer(data) {
@@ -229,11 +234,12 @@ function onNewPlayer(data) {
 	var newPlayer = new Player(data.x, data.y, false);
 	newPlayer.setID(data.id);
 
-	remotePlayers.push(newPlayer);	
+	remotePlayers.push(newPlayer);
+
+	enemyManager.reset();
 }
 
 function onMovePlayer(data) {
-	console.log("other player moved" + " " + data.x + " " +data.y);
 	var playerToMove = getPlayer(data.id);
 
 	if(!playerToMove) {
@@ -243,6 +249,10 @@ function onMovePlayer(data) {
 
 	playerToMove.setX(data.x);
 	playerToMove.setY(data.y);
+}
+
+function onCreateEnemy(data) {
+	enemyManager.spawnEnemy(data.x, data.y);
 }
 
 function onRemovePlayer(data) {
@@ -258,6 +268,21 @@ function onRemovePlayer(data) {
 
 function onNewBullet(data) {
 	bulletManager.addBullet(data.x, data.y, false);
+}
+
+function onSpawn() {
+	console.log("spawn");
+	enemyManager.setSpawningLocally(true);
+}
+
+function onNoSpawn() {
+	console.log("no spawn");
+	enemyManager.setSpawningLocally(false);
+}
+
+function onTest() {
+	console.log("test");
+//	enemyManager.setSpawningLocally(false);
 }
 
 function getPlayer(id) {

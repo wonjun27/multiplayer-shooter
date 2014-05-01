@@ -1,6 +1,7 @@
 var Player = function(posX, posY) {
 	var x = posX,
 		y = posY,
+		isSpawningEnemies = false,
 		id;
 
 	var setID = function(value) {
@@ -27,13 +28,23 @@ var Player = function(posX, posY) {
 		y = posY;
 	}	
 	
+	var setSpawningEnemies = function(value) {
+		isSpawningEnemies = value;
+	}
+
+	var isSpawningEnemies = function() {
+		return isSpawningEnemies;
+	}
+
 	return {
 		getX: getX,
 		getY: getY,
 		setX: setX,
 		setY: setY,
 		getID: getID,
-		setID: setID
+		setID: setID,
+		setSpawningEnemies: setSpawningEnemies,
+		isSpawningEnemies: isSpawningEnemies
 	}
 };
 
