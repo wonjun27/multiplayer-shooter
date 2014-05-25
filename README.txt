@@ -1,4 +1,4 @@
-- To start a multiplayer game server, please run
+- To start a multiplayer game server, run
 
 cd server
 node server.js 
@@ -11,10 +11,10 @@ node server.js
 Future To-Dos
 ==============================
 - Vertically scrolling terrain
-- Obstacles on the terain
+- Obstacles on the terrain
 - More Weapons
 - More Enemies
 - Collectibles
 - Power Boosts
 - Support on Ipad Mini (iOS/Safari)
-- Networking driven by the server
+- Move the enemy state to the server
